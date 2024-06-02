@@ -52,10 +52,14 @@ package body Webview is
    end Terminate_It;
  
 
-   -- function Dispatch
-   --   (w : Webview_Type;
-   --    fn : access procedure (w : Webview_Type; arg : System.Address);
-   --    arg : System.Address) return Error
+   procedure Dispatch
+     (w : Webview_Type;
+      fn : access procedure (w : Webview_Type; arg : System.Address);
+      arg : System.Address) is
+      err : Webview.Raw.Error := Webview.Raw.Dispatch(w, fn, arg);
+   begin
+   	Handle_Error(err);
+   end Dispatch;
  
 
    function Get_Window (w : Webview_Type) return System.Address is
@@ -124,14 +128,20 @@ package body Webview is
     Handle_Error(err);
    end Eval;
 
-   -- function Bind
-   --   (w : Webview_Type;
-   --    name : Interfaces.C.Strings.chars_ptr;
-   --    fn : access procedure
-   --      (id : Interfaces.C.Strings.chars_ptr;
-   --       req : Interfaces.C.Strings.chars_ptr;
-   --       arg : System.Address);
-   --    arg : System.Address) return Error
+   procedure Bind
+     (w : Webview_Type;
+      name : String;
+      fn : access procedure
+        (id : Interfaces.C.Strings.chars_ptr;
+         req : Interfaces.C.Strings.chars_ptr;
+         arg : System.Address);
+      arg : System.Address) is		
+      cname : Interfaces.C.Strings.chars_ptr := Interfaces.C.Strings.New_String(name);
+      err : Webview.Raw.Error := Webview.Raw.Bind(w, cname, fn, arg);
+   begin  
+   	Interfaces.C.Strings.Free(cname);
+   	Handle_Error(err);
+   end Bind;
 
    procedure Unbind (w : Webview_Type; name : String) is
     cname : Interfaces.C.Strings.chars_ptr := Interfaces.C.Strings.New_String(name);	
@@ -156,6 +166,9 @@ package body Webview is
     Handle_Error(err);
    end Ret;
 
-   -- function Get_Version return access constant Version_Info
+   function Get_Version return access constant Version_Info is	
+   begin    
+    return Webview.Raw.Get_Version;	
+   end Get_Version;
        
 end Webview;

@@ -44,7 +44,11 @@ package Webview is
 
 
    procedure Terminate_It (w : Webview_Type);
- 
+   
+   procedure Dispatch
+     (w : Webview_Type;
+      fn : access procedure (w : Webview_Type; arg : System.Address);
+      arg : System.Address);
 
    function Get_Window (w : Webview_Type) return System.Address;
  
@@ -70,7 +74,16 @@ package Webview is
 
    procedure Init (w : Webview_Type; js : String);
 
-   procedure Eval (w : Webview_Type; js : String);
+   procedure Eval (w : Webview_Type; js : String);	
+   	     	  
+   procedure Bind
+     (w : Webview_Type;
+      name : String;
+      fn : access procedure
+        (id : Interfaces.C.Strings.chars_ptr;
+         req : Interfaces.C.Strings.chars_ptr;
+         arg : System.Address);
+      arg : System.Address);
 
    procedure Unbind (w : Webview_Type; name : String);
 
@@ -79,8 +92,9 @@ package Webview is
      (w : Webview_Type;
       id : String;
       status : Integer;
-      result : String);		
-      	     
+      result : String);		    	       
+
+  function Get_Version return access constant Version_Info;      	     
 
 package Raw is
 
